@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>小玉事务所</title>
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif;
+    min-height: 100vh;
+    color: #1a2b3c;
+
+    /* 背景：雪山月牙湖景 */
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.66)),
+      url("https://p3-flow-image-sign.byteimg.com/tos-cn-i-a9rns2rl98/31200132003e4038902f0d3013002311~tplv-a9rns2rl98-image.image");
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    padding: 18px;
+    padding-bottom: 40px;
+  }
+
+  .app {
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* 顶部标题 */
+  .app-header {
+    text-align: center;
+    padding: 18px 0 12px;
+  }
+
+  .app-header h1 {
+    font-size: 22px;
+    color: #14304b;
+    letter-spacing: 2px;
+    font-weight: 600;
+  }
+
+  .app-header p {
+    font-size: 13px;
+    color: #254564;
+    margin-top: 6px;
+  }
+
+  /* Tab 切换按钮 */
+  .tab-bar {
+    display: flex;
+    background: rgba(255, 255, 255, 0.78);
+    border-radius: 16px;
+    padding: 6px;
+    box-shadow: 0 4px 18px rgba(20, 60, 110, 0.12);
+    margin-bottom: 18px;
+  }
+
+  .tab-btn {
+    flex: 1;
+    text-align: center;
+    padding: 11px 8px;
+    border: none;
+    border-radius: 12px;
+    background: transparent;
+    color: #31506f;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .tab-btn.active {
+    background: #2f6ea5;
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(47, 110, 165, 0.35);
+  }
+
+  /* 卡片 */
+  .card {
+    background: rgba(255, 255, 255, 0.86);
+    border-radius: 18px;
+    padding: 20px;
+    box-shadow: 0 6px 24px rgba(20, 60, 110, 0.14);
+    display: none;
+  }
+
+  .card.active {
+    display: block;
+  }
+
+  .card h2 {
+    text-align: center;
+    color: #17406b;
+    margin-bottom: 16px;
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+
+  label {
+    display: block;
+    margin-top: 14px;
+    margin-bottom: 6px;
+    font-weight: 500;
+    color: #17406b;
+    font-size: 14px;
+  }
+
+  input[type="text"],
+  input[type="number"],
+  textarea {
+    width: 100%;
+    padding: 11px 13px;
+    border: 1px solid #9cb7d1;
+    border-radius: 10px;
+    font-size: 15px;
+    background: #ffffffdd;
+    color: #1a2b3c;
+    outline: none;
+  }
+
+  input:focus,
+  textarea:focus {
+    border-color: #2f6ea5;
+    box-shadow: 0 0 0 3px rgba(47, 110, 165, 0.15);
+  }
+
+  textarea {
+    min-height: 72px;
+    resize: vertical;
+  }
+
+  button {
+    padding: 10px 14px;
+    border: none;
+    border-radius: 10px;
+    background: #2f6ea5;
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  button:hover {
+    background: #265987;
+  }
+
+  .item {
+    background: #f7fbff;
+    border: 1px solid #dce9f5;
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .item.done {
+    opacity: 0.5;
+  }
+
+  .item-body {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .time-info {
+    font-size: 12px;
+    color: #557494;
+    margin-bottom: 4px;
+  }
+
+  .item-body strong {
+    color: #17406b;
+  }
+
+  .item-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .icon-btn {
+    padding: 6px 10px;
+    font-size: 13px;
+    background: #4c7c5a;
+  }
+
+  .icon-btn.del {
+    background: #a34545;
+  }
+
+  .sub-group {
+    background: #f3f8fd;
+    border-radius: 14px;
+    padding: 16px;
+    margin-top: 14px;
+    border: 1px solid #dce9f5;
+  }
+
+  .sub-group h4 {
+    color: #1d5286;
+    margin-bottom: 10px;
+    font-size: 15px;
+  }
+
+  .score-summary {
+    background: #e8f2fc;
+    border-radius: 12px;
+    padding: 14px;
+    margin-top: 16px;
+    color: #17406b;
+  }
+
+  .score-summary .total {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 6px;
+    color: #2f6ea5;
+  }
+
+  .score-summary .tip {
+    font-size: 13px;
+    margin-top: 4px;
+    color: #31506f;
+  }
+
+  .result-ref {
+    background: #fff8e1;
+    border-left: 4px solid #e0a834;
+    padding: 12px;
+    border-radius: 10px;
+    margin-top: 12px;
+    font-size: 14px;
+    color: #5a4410;
+  }
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <div class="app-header">
+    <h1>个人事务工具</h1>
+    <p>做点什么 · 学点什么 · 分析什么</p>
+  </div>
+
+  <!-- Tab 切换按钮 -->
+  <div class="tab-bar">
+    <button class="tab-btn active" data-tab="todo" onclick="switchTab('todo')">做点什么</button>
+    <button class="tab-btn" data-tab="learn" onclick="switchTab('learn')">学点什么</button>
+    <button class="tab-btn" data-tab="analysis" onclick="switchTab('analysis')">分析什么</button>
+  </div>
+
+  <!-- 1. 做点什么 -->
+  <div class="card active" id="card-todo">
+    <h2>做点什么</h2>
+    <label>今日事，今日毕</label>
+    <input id="todoInput" type="text" onkeydown="if(event.key==='Enter') addTodo()" />
+    <div id="todoList"></div>
+  </div>
+
+  <!-- 2. 学点什么 -->
+  <div class="card" id="card-learn">
+    <h2>学点什么</h2>
+    <label>这道题有点意思</label>
+    <textarea id="qTitle"></textarea>
+
+    <label>它的解药</label>
+    <textarea id="qAnswer"></textarea>
+
+    <button onclick="addQuestion()">保存</button>
+    <div id="qList"></div>
+  </div>
+
+  <!-- 3. 分析什么 -->
+  <div class="card" id="card-analysis">
+    <h2>分析什么</h2>
+
+    <label>这件事情</label>
+    <input id="eventName" type="text" />
+
+    <div class="sub-group">
+      <h4>收益与消耗</h4>
+
+      <label>金钱</label>
+      <textarea id="moneyTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="moneyScore" min="1" max="10" value="5" />
+
+      <label>时间消耗</label>
+      <textarea id="timeTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="timeScore" min="1" max="10" value="5" />
+
+      <label>精神消耗</label>
+      <textarea id="mentalTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="mentalScore" min="1" max="10" value="5" />
+
+      <label>成长益处</label>
+      <textarea id="growTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="growScore" min="1" max="10" value="5" />
+
+      <label>人际风险</label>
+      <textarea id="socialRiskTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="socialRiskScore" min="1" max="10" value="5" />
+
+      <label>卷入是非</label>
+      <textarea id="troubleTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="troubleScore" min="1" max="10" value="5" />
+    </div>
+
+    <div class="sub-group">
+      <h4>深度思考</h4>
+
+      <label>最坏的结果我扛得住吗？</label>
+      <textarea id="worstTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="worstScore" min="1" max="10" value="5" />
+
+      <label>退路是什么？</label>
+      <textarea id="backupTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="backupScore" min="1" max="10" value="5" />
+
+      <label>对方动机、立场</label>
+      <textarea id="motiveTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="motiveScore" min="1" max="10" value="5" />
+
+      <label>短期看，是加分还是消耗？</label>
+      <textarea id="shortTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="shortScore" min="1" max="10" value="5" />
+
+      <label>一年之后看，是加分还是消耗？</label>
+      <textarea id="yearTxt"></textarea>
+      <label>打分（1~10）</label>
+      <input type="number" id="yearScore" min="1" max="10" value="5" />
+    </div>
+
+    <button onclick="addAnalysis()">保存本次分析</button>
+
+    <div class="score-summary">
+      <div>计分说明：成长益处、退路、对方动机、短期判断、一年后价值为正向加分；金钱消耗、时间消耗、精神消耗、人际风险、卷入是非、最坏结果为负向扣分。</div>
+      <div class="total">当前总分：<span id="currentTotal">0</span></div>
+      <div class="tip">建议：分数明显偏高可优先推进；明显偏低要谨慎；中间分数建议再看退路和最坏结果后决定。</div>
+    </div>
+
+    <div id="analysisList"></div>
+  </div>
+
+</div>
+
+<script>
+  // ========== Tab 切换 ==========
+  function switchTab(name) {
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.tab === name);
+    });
+    document.querySelectorAll('.card').forEach(card => {
+      card.classList.toggle('active', card.id === 'card-' + name);
+    });
+  }
+
+  // ========== 1 做点什么 ==========
+  let todoList = JSON.parse(localStorage.getItem("todoList")) || [];
+
+  function renderTodo() {
+    const wrap = document.getElementById("todoList");
+    wrap.innerHTML = "";
+
+    const pending = todoList.filter(i => !i.done);
+    const finished = todoList.filter(i => i.done);
+    const sorted = [...pending, ...finished];
+
+    sorted.forEach(item => {
+      const idx = todoList.findIndex(x => x.time === item.time);
+      const div = document.createElement('div');
+      div.className = "item" + (item.done ? " done" : "");
+      div.innerHTML = `
+        <div class="item-body">
+          <div class="time-info">⏰ ${item.time}</div>
+          <div><strong>${item.text}</strong></div>
+          <div style="margin-top:4px;font-size:13px;color:#557494;">
+            ${item.done ? "✅ 已处理" : "🔘 待处理"}
+          </div>
+        </div>
+        <div class="item-actions">
+          <button class="icon-btn" onclick="toggleTodo(${idx})">
+            ${item.done ? "恢复" : "完成"}
+          </button>
+          <button class="icon-btn del" onclick="delTodo(${idx})">删除</button>
+        </div>`;
+      wrap.appendChild(div);
+    });
+  }
+
+  function addTodo() {
+    const input = document.getElementById("todoInput");
+    const val = input.value.trim();
+    if (!val) return;
+
+    todoList.push({
+      text: val,
+      done: false,
+      time: new Date().toLocaleString()
+    });
+
+    saveTodo();
+    renderTodo();
+    input.value = "";
+  }
+
+  function toggleTodo(i) {
+    todoList[i].done = !todoList[i].done;
+    saveTodo();
+    renderTodo();
+  }
+
+  function delTodo(i) {
+    todoList.splice(i, 1);
+    saveTodo();
+    renderTodo();
+  }
+
+  function saveTodo() {
+    localStorage.setItem("todoList", JSON.stringify(todoList));
+  }
+
+  renderTodo();
+
+  // ========== 2 学点什么 ==========
+  let qList = JSON.parse(localStorage.getItem("qList")) || [];
+
+  function renderQ() {
+    const wrap = document.getElementById("qList");
+    wrap.innerHTML = "";
+
+    qList.forEach((item, idx) => {
+      const div = document.createElement('div');
+      div.className = "item";
+      div.innerHTML = `
+        <div class="item-body">
+          <div><strong>题目：</strong>${item.title}</div>
+          <div style="margin-top:6px;"><strong>解析：</strong>${item.ans}</div>
+        </div>
+        <div class="item-actions">
+          <button class="icon-btn" onclick="copyQ(${idx})">复制</button>
+          <button class="icon-btn del" onclick="delQ(${idx})">删除</button>
+        </div>`;
+      wrap.appendChild(div);
+    });
+  }
+
+  function addQuestion() {
+    const title = document.getElementById("qTitle").value.trim();
+    const ans = document.getElementById("qAnswer").value.trim();
+    if (!title) return;
+
+    qList.push({ title, ans });
+    saveQ();
+    renderQ();
+
+    document.getElementById("qTitle").value = "";
+    document.getElementById("qAnswer").value = "";
+  }
+
+  function copyQ(idx) {
+    const item = qList[idx];
+    const text = `题目：${item.title}\n解析：${item.ans}`;
+    navigator.clipboard.writeText(text).then(() => {
+      alert("已复制题目和解析");
+    });
+  }
+
+  function delQ(i) {
+    qList.splice(i, 1);
+    saveQ();
+    renderQ();
+  }
+
+  function saveQ() {
+    localStorage.setItem("qList", JSON.stringify(qList));
+  }
+
+  renderQ();
+
+  // ========== 3 分析什么 ==========
+  let analysisList = JSON.parse(localStorage.getItem("analysisList")) || [];
+
+  function calcTotal() {
+    const moneyScore = Number(document.getElementById("moneyScore").value) || 0;
+    const timeScore = Number(document.getElementById("timeScore").value) || 0;
+    const mentalScore = Number(document.getElementById("mentalScore").value) || 0;
+    const growScore = Number(document.getElementById("growScore").value) || 0;
+    const socialRiskScore = Number(document.getElementById("socialRiskScore").value) || 0;
+    const troubleScore = Number(document.getElementById("troubleScore").value) || 0;
+    const worstScore = Number(document.getElementById("worstScore").value) || 0;
+    const backupScore = Number(document.getElementById("backupScore").value) || 0;
+    const motiveScore = Number(document.getElementById("motiveScore").value) || 0;
+    const shortScore = Number(document.getElementById("shortScore").value) || 0;
+    const yearScore = Number(document.getElementById("yearScore").value) || 0;
+
+    const total = growScore + backupScore + motiveScore + shortScore + yearScore
+      - (moneyScore + timeScore + mentalScore + socialRiskScore + troubleScore + worstScore);
+
+    document.getElementById("currentTotal").textContent = total;
+    return total;
+  }
+
+  document.querySelectorAll("#card-analysis input[type='number']").forEach(input => {
+    input.addEventListener("input", calcTotal);
+  });
+
+  function addAnalysis() {
+    const name = document.getElementById("eventName").value.trim();
+    if (!name) return;
+
+    const moneyTxt = document.getElementById("moneyTxt").value.trim();
+    const timeTxt = document.getElementById("timeTxt").value.trim();
+    const mentalTxt = document.getElementById("mentalTxt").value.trim();
+    const growTxt = document.getElementById("growTxt").value.trim();
+    const socialRiskTxt = document.getElementById("socialRiskTxt").value.trim();
+    const troubleTxt = document.getElementById("troubleTxt").value.trim();
+    const worstTxt = document.getElementById("worstTxt").value.trim();
+    const backupTxt = document.getElementById("backupTxt").value.trim();
+    const motiveTxt = document.getElementById("motiveTxt").value.trim();
+    const shortTxt = document.getElementById("shortTxt").value.trim();
+    const yearTxt = document.getElementById("yearTxt").value.trim();
+
+    const moneyScore = Number(document.getElementById("moneyScore").value);
+    const timeScore = Number(document.getElementById("timeScore").value);
+    const mentalScore = Number(document.getElementById("mentalScore").value);
+    const growScore = Number(document.getElementById("growScore").value);
+    const socialRiskScore = Number(document.getElementById("socialRiskScore").value);
+    const troubleScore = Number(document.getElementById("troubleScore").value);
+    const worstScore = Number(document.getElementById("worstScore").value);
+    const backupScore = Number(document.getElementById("backupScore").value);
+    const motiveScore = Number(document.getElementById("motiveScore").value);
+    const shortScore = Number(document.getElementById("shortScore").value);
+    const yearScore = Number(document.getElementById("yearScore").value);
+
+    const totalScore = growScore + backupScore + motiveScore + shortScore + yearScore
+      - (moneyScore + timeScore + mentalScore + socialRiskScore + troubleScore + worstScore);
+
+    analysisList.push({
+      name, moneyTxt, timeTxt, mentalTxt, growTxt, socialRiskTxt, troubleTxt,
+      worstTxt, backupTxt, motiveTxt, shortTxt, yearTxt,
+      moneyScore, timeScore, mentalScore, growScore, socialRiskScore, troubleScore,
+      worstScore, backupScore, motiveScore, shortScore, yearScore, totalScore
+    });
+
+    saveAnalysis();
+    renderAnalysis();
+
+    document.querySelectorAll("#card-analysis textarea, #card-analysis input[type='text']").forEach(el => {
+      el.value = "";
+    });
+    document.querySelectorAll("#card-analysis input[type='number']").forEach(el => {
+      el.value = 5;
+    });
+    document.getElementById("currentTotal").textContent = "0";
+  }
+
+  function renderAnalysis() {
+    const wrap = document.getElementById("analysisList");
+    wrap.innerHTML = "";
+
+    analysisList.forEach((item, idx) => {
+      const div = document.createElement('div');
+      div.className = "item";
+      div.innerHTML = `
+        <div class="item-body">
+          <div style="font-size:16px;font-weight:700;color:#17406b;margin-bottom:8px;">
+            ${item.name}
+          </div>
+          <div>金钱：${item.moneyTxt || "无"}｜${item.moneyScore}分</div>
+          <div>时间消耗：${item.timeTxt || "无"}｜${item.timeScore}分</div>
+          <div>精神消耗：${item.mentalTxt || "无"}｜${item.mentalScore}分</div>
+          <div>成长益处：${item.growTxt || "无"}｜${item.growScore}分</div>
+          <div>人际风险：${item.socialRiskTxt || "无"}｜${item.socialRiskScore}分</div>
+          <div>卷入是非：${item.troubleTxt || "无"}｜${item.troubleScore}分</div>
+          <div>最坏结果：${item.worstTxt || "无"}｜${item.worstScore}分</div>
+          <div>退路：${item.backupTxt || "无"}｜${item.backupScore}分</div>
+          <div>对方动机：${item.motiveTxt || "无"}｜${item.motiveScore}分</div>
+          <div>短期：${item.shortTxt || "无"}｜${item.shortScore}分</div>
+          <div>一年后：${item.yearTxt || "无"}｜${item.yearScore}分</div>
+          <div style="margin-top:10px;font-weight:700;color:#2f6ea5;">
+            总分：${item.totalScore}
+          </div>
+        </div>
+        <div class="item-actions">
+          <button class="icon-btn del" onclick="delAnalysis(${idx})">删除</button>
+        </div>`;
+      wrap.appendChild(div);
+    });
+  }
+
+  function delAnalysis(i) {
+    analysisList.splice(i, 1);
+    saveAnalysis();
+    renderAnalysis();
+  }
+
+  function saveAnalysis() {
+    localStorage.setItem("analysisList", JSON.stringify(analysisList));
+  }
+
+  renderAnalysis();
+</script>
+</body>
+</html>
